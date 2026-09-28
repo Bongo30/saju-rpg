@@ -41,7 +41,7 @@ export class CreateScene extends Phaser.Scene {
         // 사주는 출발하는 이 순간의 시각으로 최종 확정된다 (미리보기와 다를 수 있다).
         this.character = createCharacter();
         this.registry.set('character', this.character);
-        this.scene.start('Village');
+        this.scene.start('World');
       },
       0x2e5d33,
     );

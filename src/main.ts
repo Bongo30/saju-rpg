@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
 import { TitleScene } from './scenes/TitleScene';
 import { CreateScene } from './scenes/CreateScene';
-import { VillageScene } from './scenes/VillageScene';
-import { BattleScene } from './scenes/BattleScene';
+import { WorldScene } from './scenes/WorldScene';
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -14,5 +13,9 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [TitleScene, CreateScene, VillageScene, BattleScene],
+  physics: {
+    default: 'arcade',
+    arcade: { debug: false },
+  },
+  scene: [TitleScene, CreateScene, WorldScene],
 });
