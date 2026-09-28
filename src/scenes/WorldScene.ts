@@ -24,11 +24,11 @@ const ATTACK_COOLDOWN_MS = 480;
 const MONSTER_ATTACK_COOLDOWN_MS = 1400;
 const AGGRO_RANGE = 150;
 
-type ArcadeCircle = Phaser.GameObjects.Arc & { body: Phaser.Physics.Arcade.Body };
+type ArcadeSprite = Phaser.GameObjects.Sprite & { body: Phaser.Physics.Arcade.Body };
 
 interface MonsterActor {
   def: MonsterDef;
-  sprite: ArcadeCircle;
+  sprite: ArcadeSprite;
   hpBarBg: Phaser.GameObjects.Rectangle;
   hpBar: Phaser.GameObjects.Rectangle;
   dominant: Element;
@@ -42,12 +42,13 @@ interface MonsterActor {
   alive: boolean;
   fireHits: number;
   weakened: boolean;
+  baseTint?: number;
 }
 
 /** 마을+들판+보스숲을 한 맵으로 잇는 실시간 액션 씬. 이동은 방향키/WASD/화면 패드, 공격은 오행 버튼/숫자키. */
 export class WorldScene extends Phaser.Scene {
   private character!: Character;
-  private player!: ArcadeCircle;
+  private player!: ArcadeSprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
   private touchDir = new Phaser.Math.Vector2(0, 0);
@@ -61,11 +62,22 @@ export class WorldScene extends Phaser.Scene {
   private playerHpBar!: Phaser.GameObjects.Rectangle;
   private playerHpText!: Phaser.GameObjects.Text;
   private lastAttackAt = 0;
+  private jobColor = 0xffffff;
   private spawnPoint = new Phaser.Math.Vector2(WORLD_W / 2, 130);
   private victoryShown = false;
 
   constructor() {
     super('World');
+  }
+
+  preload() {
+    this.load.image('hero', 'assets/hero.png');
+    this.load.image('chief', 'assets/chief.png');
+    this.load.image('boar', 'assets/boar.png');
+    this.load.image('boss_tree', 'assets/boss_tree.png');
+    this.load.image('deco_tree', 'assets/deco_tree.png');
+    this.load.image('grass', 'assets/grass.png');
+    this.load.image('dirt', 'assets/dirt.png');
   }
 
   create() {
@@ -90,15 +102,29 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private buildWorld() {
-    this.add.rectangle(WORLD_W / 2, 100, WORLD_W, 200, 0x2e5d33).setDepth(-10);
-    this.add.rectangle(WORLD_W / 2, 700, WORLD_W, 1000, 0x1f3d22).setDepth(-10);
-    this.add.rectangle(WORLD_W / 2, 1300, WORLD_W, 400, 0x142a17).setDepth(-10);
+    this.add.tileSprite(WORLD_W / 2, WORLD_H / 2, WORLD_W, WORLD_H, 'grass').setDepth(-10);
+    this.add.tileSprite(WORLD_W / 2, 1300, WORLD_W, 400, 'dirt').setAlpha(0.55).setDepth(-9);
+    this.add.rectangle(WORLD_W / 2, 100, WORLD_W, 200, 0x2e5d33, 0.35).setDepth(-8);
+
+    // 배경 장식 나무
+    const decoSpots: Array<[number, number]> = [
+      [30, 260],
+      [410, 310],
+      [40, 650],
+      [400, 900],
+      [60, 1050],
+      [380, 700],
+    ];
+    for (const [x, y] of decoSpots) {
+      this.add.image(x, y, 'deco_tree').setDepth(0).setScale(0.55);
+    }
+
     this.add.text(WORLD_W / 2, 40, '동방 청림 · 새싹마을', { fontSize: '17px', color: '#f5deb3' }).setOrigin(0.5).setDepth(-5);
     this.add.text(WORLD_W / 2, 230, '들판 (가시멧돼지 출몰)', { fontSize: '12px', color: '#9bd39b' }).setOrigin(0.5).setDepth(-5);
     this.add.text(WORLD_W / 2, 1120, '신단수 숲', { fontSize: '12px', color: '#e0a0a0' }).setOrigin(0.5).setDepth(-5);
 
     // 촌장 NPC
-    const chief = this.add.circle(WORLD_W / 2, 100, 15, 0xf5deb3).setDepth(1);
+    const chief = this.add.image(WORLD_W / 2, 100, 'chief').setDepth(1).setScale(0.8);
     this.physics.add.existing(chief, true);
     this.add.text(WORLD_W / 2, 74, '촌장', { fontSize: '11px', color: '#f5deb3' }).setOrigin(0.5).setDepth(1);
 
@@ -123,10 +149,13 @@ export class WorldScene extends Phaser.Scene {
 
   private buildPlayer() {
     const jobColor = ELEMENT_HEX[this.character.jobClass.element];
-    const player = this.add.circle(this.spawnPoint.x, this.spawnPoint.y, 14, jobColor) as ArcadeCircle;
+    this.jobColor = jobColor;
+    const player = this.add.sprite(this.spawnPoint.x, this.spawnPoint.y, 'hero') as ArcadeSprite;
+    player.setScale(0.5);
+    player.setTint(jobColor);
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
-    player.body.setCircle(14);
+    player.body.setCircle(24, 8, 8);
     this.player = player;
     this.add
       .text(0, -26, this.character.jobClass.name, { fontSize: '10px', color: '#ffffff' })
@@ -149,10 +178,15 @@ export class WorldScene extends Phaser.Scene {
     const { analysis, stats } = monsterAnalysis(pillars);
     const maxHp = Math.round((isBoss ? 260 : 60) + stats.방어 * (isBoss ? 1.6 : 0.7));
     const radius = isBoss ? 30 : 15;
-    const color = isBoss ? 0x8a3b3b : 0x6a4a2a;
-    const sprite = this.add.circle(x, y, radius, color) as ArcadeCircle;
+    const sprite = this.add.sprite(x, y, isBoss ? 'boss_tree' : 'boar') as ArcadeSprite;
     this.physics.add.existing(sprite);
-    sprite.body.setCircle(radius);
+    if (isBoss) {
+      sprite.setScale(0.5);
+      sprite.body.setCircle(60, 36, 36);
+    } else {
+      sprite.setScale(0.28).setTint(0xb0784a);
+      sprite.body.setCircle(54, 18, 10);
+    }
     sprite.body.setCollideWorldBounds(true);
     // 플레이어가 밀어붙여 통과하지 못하게: 몬스터는 부딪혀도 밀리지 않는다(자기 AI로만 움직임).
     sprite.body.setImmovable(true);
@@ -177,6 +211,7 @@ export class WorldScene extends Phaser.Scene {
       alive: true,
       fireHits: 0,
       weakened: false,
+      baseTint: isBoss ? undefined : 0xb0784a,
     };
     (sprite as unknown as { __label: Phaser.GameObjects.Text }).__label = nameText;
     this.monsters.push(actor);
@@ -343,7 +378,7 @@ export class WorldScene extends Phaser.Scene {
         const dmg = Math.max(1, Math.round(base * 0.6));
         this.applyDamageToMonster(target, dmg);
         this.showToast(`금 공격이 신단수의 굳센 목 기운에 튕겨 나갔다! (${dmg}, 목견금결)`);
-        this.flash(target.sprite, 0xffffff);
+        this.flash(target.sprite, 0xffffff, target.baseTint);
         return;
       }
       if (this.selectedElement === '화') {
@@ -360,7 +395,7 @@ export class WorldScene extends Phaser.Scene {
 
     const result = computeDamage(base, this.selectedElement, effectiveDominant, target.yong);
     this.applyDamageToMonster(target, result.damage);
-    this.flash(target.sprite, 0xffffff);
+    this.flash(target.sprite, 0xffffff, target.baseTint);
     if (target.hp > 0) {
       this.showToast(`${this.selectedElement} 공격! ${result.damage} 피해 (${result.relation.message}${result.yongBonus ? ', 보완 오행이라 약해짐' : ''})`);
     }
@@ -449,10 +484,12 @@ export class WorldScene extends Phaser.Scene {
     });
   }
 
-  private flash(target: Phaser.GameObjects.Arc, color: number) {
-    const original = target.fillColor;
-    target.setFillStyle(color);
-    this.time.delayedCall(120, () => target.setFillStyle(original));
+  private flash(target: ArcadeSprite, color: number, restoreTint?: number) {
+    target.setTint(color);
+    this.time.delayedCall(120, () => {
+      if (restoreTint !== undefined) target.setTint(restoreTint);
+      else target.clearTint();
+    });
   }
 
   private respawnPlayer() {
@@ -500,7 +537,7 @@ export class WorldScene extends Phaser.Scene {
         m.lastAttackAt = now;
         const result = computeDamage(m.atk, m.dominant, this.character.analysis.dominant, this.character.analysis.yong);
         this.character.hp = Math.max(0, this.character.hp - result.damage);
-        this.flash(this.player, 0xff6666);
+        this.flash(this.player, 0xff6666, this.jobColor);
         this.showToast(`${m.def.name}의 ${m.dominant} 공격! ${result.damage} 피해`);
         if (this.character.hp <= 0) {
           this.respawnPlayer();
