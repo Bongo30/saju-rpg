@@ -15,7 +15,7 @@ export class CreateScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.add.text(width / 2, 40, '사주팔자', { fontSize: '28px', color: '#f5deb3' }).setOrigin(0.5);
     this.add
-      .text(width / 2, 68, '지금 이 순간의 시각으로 사주를 세웁니다 (택일 가능)', {
+      .text(width / 2, 68, '모험을 떠나는 순간의 시각이 사주로 확정됩니다 (택일)', {
         fontSize: '12px',
         color: '#888888',
       })
@@ -25,7 +25,9 @@ export class CreateScene extends Phaser.Scene {
     this.info = this.add.container(0, 0);
     this.renderCharacter();
 
-    makeButton(this, width / 2, height - 130, width * 0.6, '다시 뽑기 (택일)', () => {
+    // 사주는 "떠나는 순간"에 확정된다 (설계서 3.1). 출발 전까지는 몇 번이든 미리보기로
+    // 지금 이 순간의 사주를 다시 확인할 수 있고, 원하는 사주가 나올 때를 기다리는 것이 택일이다.
+    makeButton(this, width / 2, height - 130, width * 0.6, '지금 사주 미리보기 새로고침', () => {
       this.character = createCharacter();
       this.renderCharacter();
     });
@@ -36,6 +38,8 @@ export class CreateScene extends Phaser.Scene {
       width * 0.6,
       '동방 새싹마을로 출발',
       () => {
+        // 사주는 출발하는 이 순간의 시각으로 최종 확정된다 (미리보기와 다를 수 있다).
+        this.character = createCharacter();
         this.registry.set('character', this.character);
         this.scene.start('Village');
       },
