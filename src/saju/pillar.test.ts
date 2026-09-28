@@ -1,4 +1,4 @@
-import { dayPillar, pillarFromIndex } from './pillar';
+import { dayPillar, pillarFromIndex, fourPillars, parsePillarName } from './pillar';
 import { controls, generates } from './ganji';
 
 describe('pillarFromIndex', () => {
@@ -18,6 +18,31 @@ describe('dayPillar', () => {
 
   it('기준일 이전 날짜도 계산', () => {
     expect(dayPillar(1899, 12, 31).name).toBe('계유');
+  });
+});
+
+describe('parsePillarName', () => {
+  it('두 글자 간지를 기둥으로 만든다', () => {
+    expect(parsePillarName('갑인').name).toBe('갑인');
+    expect(parsePillarName('계해').name).toBe('계해');
+  });
+});
+
+describe('fourPillars', () => {
+  it('설계서 3.3 예시(2026-12-04 00:30)와 일치 — 병오년 기해월 임자일 경자시', () => {
+    // saju_stat_prototype.py / monster_prototype.py의 검증값과 동일한 벡터
+    const p = fourPillars(new Date(2026, 11, 4, 0, 30));
+    expect(p.year.name).toBe('병오');
+    expect(p.month.name).toBe('기해');
+    expect(p.day.name).toBe('임자');
+    expect(p.hour.name).toBe('경자');
+  });
+
+  it('통자시: 23시 출생은 다음날 일주로 계산한다', () => {
+    // 경도 보정(-32분) 후 22:59가 되는 23:31은 그대로 당일, 23:32는 통자시로 다음날 일주
+    const before = fourPillars(new Date(2026, 8, 28, 23, 31));
+    const after = fourPillars(new Date(2026, 8, 28, 23, 32));
+    expect(after.day.index).toBe((before.day.index + 1) % 60);
   });
 });
 

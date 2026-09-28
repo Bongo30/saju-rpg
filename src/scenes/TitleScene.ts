@@ -1,13 +1,6 @@
 import Phaser from 'phaser';
 import { dayPillar } from '../saju/pillar';
-
-const ELEMENT_COLORS: Record<string, string> = {
-  목: '#4caf50',
-  화: '#e53935',
-  토: '#c8a14a',
-  금: '#e0e0e0',
-  수: '#42a5f5',
-};
+import { ELEMENT_COLORS, makeButton } from '../game/ui';
 
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -15,21 +8,31 @@ export class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    const { width } = this.scale;
-    this.add.text(width / 2, 80, '사주 RPG', { fontSize: '40px', color: '#f5deb3' }).setOrigin(0.5);
+    const { width, height } = this.scale;
+    this.add.text(width / 2, height * 0.22, '사주 RPG', { fontSize: '44px', color: '#f5deb3' }).setOrigin(0.5);
+    this.add
+      .text(width / 2, height * 0.3, '명리학 사주로 세상에 태어난다', { fontSize: '16px', color: '#aaaaaa' })
+      .setOrigin(0.5);
 
     const today = new Date();
     const p = dayPillar(today.getFullYear(), today.getMonth() + 1, today.getDate());
     this.add
-      .text(width / 2, 180, `오늘의 일진: ${p.name}(${p.stem.hanja}${p.branch.hanja})일`, {
-        fontSize: '24px',
+      .text(width / 2, height * 0.4, `오늘의 일진: ${p.name}(${p.stem.hanja}${p.branch.hanja})일`, {
+        fontSize: '20px',
         color: ELEMENT_COLORS[p.stem.element],
       })
       .setOrigin(0.5);
+
+    makeButton(this, width / 2, height * 0.6, width * 0.6, '캐릭터 만들기', () => {
+      this.scene.start('Create');
+    });
+
     this.add
-      .text(width / 2, 220, `천간 ${p.stem.element} · 지지 ${p.branch.element} (${p.branch.animal})`, {
-        fontSize: '18px',
-        color: '#aaaaaa',
+      .text(width / 2, height * 0.9, '지금 이 순간이 캐릭터의 태어난 시각(사주)이 됩니다', {
+        fontSize: '13px',
+        color: '#888888',
+        wordWrap: { width: width * 0.8 },
+        align: 'center',
       })
       .setOrigin(0.5);
   }

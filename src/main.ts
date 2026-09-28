@@ -1,11 +1,18 @@
 import Phaser from 'phaser';
 import { TitleScene } from './scenes/TitleScene';
+import { CreateScene } from './scenes/CreateScene';
+import { VillageScene } from './scenes/VillageScene';
+import { BattleScene } from './scenes/BattleScene';
 
 new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  width: 800,
-  height: 600,
+  width: 480,
+  height: 800,
   backgroundColor: '#1a1a2e',
-  scene: [TitleScene],
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  scene: [TitleScene, CreateScene, VillageScene, BattleScene],
 });
