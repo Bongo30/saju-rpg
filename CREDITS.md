@@ -1,20 +1,20 @@
 # 그림/에셋 크레딧
 
-이 프로젝트의 `public/assets/` 안 그림은 전부 Kenney(www.kenney.nl)가 CC0 1.0 Universal
-라이선스로 공개한 무료 픽셀아트입니다. CC0는 저작자 표시 없이 상업적으로도 자유롭게 쓸 수
-있는 퍼블릭 도메인에 가까운 라이선스입니다. 원본은 kenney.nl에서 받을 수 있으며, 이 세션의
-네트워크 정책상 kenney.nl에 직접 접속할 수 없어 같은 CC0 라이선스로 미러링된
-[Tiddybub/2d-assets](https://github.com/Tiddybub/2d-assets) 저장소를 통해 받았습니다
-(저장소 자체의 `LICENSE`와 각 팩의 `SOURCE.md`/`License.txt`로 원출처와 CC0 라이선스를 확인함).
+`public/assets/` 안의 그림은 모두 CC0 1.0 Universal 라이선스로 공개된 무료 픽셀아트입니다.
+CC0는 저작자 표시 없이도 상업적으로 자유롭게 쓸 수 있는, 퍼블릭 도메인에 가까운 라이선스입니다.
+그래도 만든 분들께 감사하는 뜻으로 아래에 출처를 적어 둡니다.
 
-| 파일 | 원본 팩 | 비고 |
-|---|---|---|
-| `hero.png` | Kenney "Tiny Dungeon" | 마법사 타일. 코드에서 직업(오행)별 색으로 틴트해서 재사용 |
-| `chief.png` | Kenney "Tiny Dungeon" | 촌장 NPC로 사용하는 드워프/농부 타일 |
-| `boar.png` | Kenney "Animal Pack Remastered" | 돼지 아이콘. 코드에서 갈색으로 틴트해 가시멧돼지로 사용 |
-| `boss_tree.png` | Kenney "RPG Base" | 천년 신단수 보스 스프라이트로 사용하는 나무 타일 |
-| `deco_tree.png` | Kenney "RPG Base" | 배경 장식용 작은 나무 타일 |
-| `grass.png` | Kenney "RPG Base" | 맵 배경 잔디 타일 (반복 타일링) |
-| `dirt.png` | Kenney "RPG Base" | 신단수 숲 구역 배경 흙 타일 (반복 타일링) |
+이 세션의 네트워크 정책상 kenney.nl과 opengameart.org에 직접 접속할 수 없었습니다.
+그래서 같은 CC0 라이선스로 미러링된 [Tiddybub/2d-assets](https://github.com/Tiddybub/2d-assets)
+저장소에서 받았습니다. 원출처와 CC0 라이선스는 각 팩의 `SOURCE.md`와 `License.txt`로 확인했습니다.
 
-라이선스: CC0 1.0 Universal (Public Domain Dedication). 원저작자: Kenney (www.kenney.nl).
+| 파일 | 원본 팩 | 만든 이 | 쓰는 곳 |
+|---|---|---|---|
+| `ui/*.png` | UI Pack RPG Expansion | Kenney (kenney.nl) | 창 테두리, 버튼, 게이지 바, 닫기·체크 아이콘 |
+| `tiles/town.png` | Tiny Town | Kenney | 마을·들판·숲 지형과 건물, 신단수 보스 |
+| `tiles/dungeon.png` | Tiny Dungeon | Kenney | NPC(촌장, 상인 등)와 도깨비, 대화창 초상화 |
+| `sprites/boar.png`, `snake.png`, `toad.png`, `woodpecker.png` | Animal Pack Remastered | Kenney | 멧돼지·뱀·두꺼비·딱따구리 몬스터 (작게 줄이고 색과 외곽선을 손봄) |
+| `sprites/items.png` | [16x16 RPG items](https://opengameart.org/content/16x16-rpg-items) | OpenGameArt 작가 | 아이템 아이콘 (배경색을 투명으로 바꿈) |
+| `sprites/hero_walk.png`, `hero_face.png` | [2D RPG character walk spritesheet](https://opengameart.org/content/2d-rpg-character-walk-spritesheet) | OpenGameArt 작가 | 주인공 걷기 애니메이션과 얼굴 초상화 |
+
+글꼴: [Jua](https://fonts.google.com/specimen/Jua) (Google Fonts, SIL Open Font License 1.1). 웹에서 불러옵니다.
