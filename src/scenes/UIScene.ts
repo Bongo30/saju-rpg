@@ -468,9 +468,10 @@ export class UIScene extends Phaser.Scene implements UIHost {
     this.syncModal();
   }
 
-  closeWindow(silent = false) {
+  closeWindow(silent = false, force = false) {
     if (!this.win) return;
-    if (this.winName === 'death' && !silent) return; // 기절 창은 버튼으로만 닫는다
+    // 기절 창은 바깥 누르기·Esc로는 안 닫히고, "마을에서 깨어나기" 버튼(force)으로만 닫는다
+    if (this.winName === 'death' && !silent && !force) return;
     this.win.destroy();
     this.win = undefined;
     this.winName = undefined;

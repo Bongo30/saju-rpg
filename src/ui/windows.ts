@@ -17,7 +17,7 @@ export const WIN_W = 460;
 export interface UIHost extends Phaser.Scene {
   state: GameState;
   toast(msg: string, color?: string): void;
-  closeWindow(): void;
+  closeWindow(silent?: boolean, force?: boolean): void;
   openWindow(name: string, arg?: unknown): void;
   getWorldDots(): { player: { x: number; y: number }; npcs: Array<{ x: number; y: number; quest: string }>; monsters: Array<{ x: number; y: number; boss: boolean }> } | null;
 }
@@ -782,7 +782,7 @@ export class DeathWindow extends GameWindow {
     this.t(cx, this.top + 134, '마을 어귀에서 체력을 회복하고 깨어납니다.', 14, '#e8d8b8', { originX: 0.5 });
     this.add2(button(this.ui, cx, this.top + 220, 260, 54, '마을에서 깨어나기', () => {
       bus.emit('cmd', { type: 'revive' });
-      this.ui.closeWindow();
+      this.ui.closeWindow(false, true);
     }, 'beige', 18));
   }
 }
